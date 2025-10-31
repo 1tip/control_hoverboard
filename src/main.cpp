@@ -33,6 +33,8 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
    - FailSafe 기능 : 수신기 배터리분리시 모터 오동작 방지
 */
 
+/* 2025.11.30 수정 - 체크섬 오류 */
+
 #include <Arduino.h>
 #include <TFT_eSPI.h>
 #include <Preferences.h>
@@ -46,8 +48,8 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
 #define CRC_POLY 0x1021
 #define START_CHAR '/'
 
-#define MAX_SPEED 500
-#define MAX_STEER 500
+#define MAX_SPEED 200
+#define MAX_STEER 400
 
 #define BTN1_PIN 0
 #define BTN2_PIN 35
@@ -59,7 +61,7 @@ InputMode currentMode = MODE_PWM;
 // ---------------- 핀 ----------------
 #define PPM_PIN 27
 #define PWM_CH1_PIN 27
-#define PWM_CH2_PIN 26
+#define PWM_CH2_PIN 26g
 #define PWM_CH3_PIN 25
 #define PWM_CH4_PIN 33
 
@@ -150,8 +152,10 @@ void sendHoverCmd(int16_t steer, int16_t speed) {
   hoverTx.wStateSlave = 0;
   hoverTx.checksum = CalcCRC((uint8_t *)&hoverTx, sizeof(hoverTx)-2);
   hoverSerial1.write((uint8_t *)&hoverTx, sizeof(hoverTx));
-
+ 
+  // 두 번째 모터에 대한 명령을 보내기 전에 체크섬을 다시 계산합니다.
   hoverTx.iSpeedLeft = motor2Value;
+  hoverTx.checksum = CalcCRC((uint8_t *)&hoverTx, sizeof(hoverTx)-2);
   hoverSerial2.write((uint8_t *)&hoverTx, sizeof(hoverTx));
 
   // TFT 표시
