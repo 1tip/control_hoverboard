@@ -36,7 +36,7 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
 */
 
 /* 2025.10.31 수정 - 체크섬 오류 */
-/* 2025.11.01 수정 - 호버보드 전원OFF시 MCU LCD에 "OFF"표시 */
+/* 2025.11.01 수정 - 호버보드의 전원OFF 상태를 파악후 MCU LCD에 "OFF"표시 */
 
 //git add .
 //git commit -m "커밋 메시지"
