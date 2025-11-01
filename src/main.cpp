@@ -1,7 +1,7 @@
 /* 2025.11.01
  사용 MCU : ESP32 T-Display
  호버보드 제어를 위한  Arduino 프로그램
- RC송신기 -> RC수신기(PPM/PWM) -> MCU -> 호버보드
+ RC송신기 -> RC수신기(PPM/PWM) -> MCU(Control_hoverboard) -> 호버보드
 
  호버보드 펌웨어 정보 : https://github.com/RoboDurden/Hoverboard-Firmware-Hack-Gen2.x-GD32
   * 펌웨어 설정값(config.h): REMOTE_UART, SINGLE
