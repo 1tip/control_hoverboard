@@ -1,11 +1,13 @@
-// https://github.com/RoboDurden/Hoverboard-Firmware-Hack-Gen2.x-GD32
-// MCU : ESP32 T-Display
-// 호버보드 제어를 위한  Arduino 프로그램
-// RC수신기(PPM, PWM) -> MCU -> 호버보드
+/* 2025.11.01
+ 사용 MCU : ESP32 T-Display
+ 호버보드 제어를 위한  Arduino 프로그램
+ RC송신기 -> RC수신기(PPM/PWM) -> MCU -> 호버보드
 
+ 호버보드 펌웨어 정보 : https://github.com/RoboDurden/Hoverboard-Firmware-Hack-Gen2.x-GD32
+  * 펌웨어 설정값(config.h): REMOTE_UART, SINGLE
+*/
 
 /*  2025.10.21 19:25
-
 호버보드용 시리얼 통신모듈 (REMOTE_UART) : RC PPM/PWM입력 -> 신호처리(MCU) -> SERIAL출력 -> 호버보드
   - 통신 프로토콜 맞춤
   - 수신코드 삭제(호버보드 -> MCU)
@@ -29,7 +31,7 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
 */
 
 /* 2025.10.28 추가
-   - 수신기능 (RX핀을 통해 Feedback 받음, 호버보드 배터리 전압표시)
+   - 수신기능 (RX핀을 통해 Feedback 받음, LCD에 호버보드 배터리 전압표시)
    - FailSafe 기능 : 수신기 배터리분리시 모터 오동작 방지
 */
 
@@ -48,7 +50,7 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
 #define CRC_POLY 0x1021
 #define START_CHAR '/'
 
-#define MAX_SPEED 200
+#define MAX_SPEED 250
 #define MAX_STEER 400
 
 #define BTN1_PIN 0
@@ -61,7 +63,7 @@ InputMode currentMode = MODE_PWM;
 // ---------------- 핀 ----------------
 #define PPM_PIN 27
 #define PWM_CH1_PIN 27
-#define PWM_CH2_PIN 26g
+#define PWM_CH2_PIN 26
 #define PWM_CH3_PIN 25
 #define PWM_CH4_PIN 33
 
