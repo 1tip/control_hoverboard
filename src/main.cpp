@@ -35,7 +35,13 @@ iSpeedLeft만 제어, iSpeedRight 항상 0
    - FailSafe 기능 : 수신기 배터리분리시 모터 오동작 방지
 */
 
-/* 2025.11.30 수정 - 체크섬 오류 */
+/* 2025.10.31 수정 - 체크섬 오류 */
+/* 2025.11.01 수정 - 호버보드 전원OFF시 MCU LCD에 "OFF"표시 */
+
+//git add .
+//git commit -m "커밋 메시지"
+//git push -v
+
 
 #include <Arduino.h>
 #include <TFT_eSPI.h>
@@ -109,6 +115,7 @@ struct HoverboardData {
 #pragma pack(pop)
 
 HoverboardData hoverboardData;
+unsigned long lastHoverboardDataTime = 0; // 호버보드 데이터 마지막 수신 시간
 
 // ---------------- CRC ----------------
 uint16_t CalcCRC(uint8_t *ptr, int count) {
@@ -329,12 +336,13 @@ void receiveHoverData(HardwareSerial &serialPort) {
                 serialPort.readBytes(buffer + 2, bytesToRead);
                 memcpy(&hoverboardData, buffer, sizeof(HoverboardData));
                 uint16_t crc = calculateCRC(buffer, sizeof(HoverboardData)-2);
+                lastHoverboardDataTime = millis(); // 데이터 수신 시간 갱신
                 if (crc == hoverboardData.checksum) {
                     // TFT 표시
                     tft.setTextSize(2);
                     tft.setTextColor(TFT_GREEN, TFT_BLACK);
                     tft.setCursor(140, 5);
-                    tft.printf("%.2fV ", hoverboardData.voltage / 100.0f);
+                    tft.printf("  %.2fV ", hoverboardData.voltage / 100.0f);
                 }
             }
         }
@@ -343,6 +351,7 @@ void receiveHoverData(HardwareSerial &serialPort) {
 
 // ---------------- LOOP ----------------
 void loop() {
+    const unsigned long HOVER_TIMEOUT = 1000; // 1초 동안 데이터 없으면 OFF
     checkButtonLongPress();
 
     bool signalLost = false;
@@ -380,5 +389,12 @@ void loop() {
     drawVerticalBars();
 
     receiveHoverData(hoverSerial1);
-    //receiveHoverData(hoverSerial2);
+
+    if (millis() - lastHoverboardDataTime > HOVER_TIMEOUT) {
+        // 호버보드 통신 타임아웃
+        tft.setTextSize(2);
+        tft.setTextColor(TFT_RED, TFT_BLACK);
+        tft.setCursor(140, 5);
+        tft.print("     OFF"); // 이전 값 지우기 위해 공백 추가
+    }
 }
